@@ -2,6 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const pageRoute = require("./routers/pageRouter");
 const courseRoute = require("./routers/courseRouter");
+const categoryRoute = require("./routers/categoryRouter");
+const userRoute = require('./routers/userRouter');
 
 const app = express();
 
@@ -23,6 +25,8 @@ app.use(express.urlencoded({extended: true}));
 //ROUTERS
 app.use("/", pageRoute);
 app.use("/courses", courseRoute);
+app.use("/categories", categoryRoute);
+app.use("/users", userRoute);
 
 const port = 3000;
 app.listen(port, (res, req) => {
