@@ -1,26 +1,41 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const session = require("express-session");
+const MongoStore = require('connect-mongo');
 const pageRoute = require("./routers/pageRouter");
 const courseRoute = require("./routers/courseRouter");
 const categoryRoute = require("./routers/categoryRouter");
-const userRoute = require('./routers/userRouter');
+const userRoute = require("./routers/userRouter");
 
 const app = express();
 
 //Connect DB
-mongoose
-  .connect("mongodb://localhost/smartedu-db")
-  .then(() => {
-    console.log("DB connected successfully");
-  });
+mongoose.connect("mongodb://localhost/smartedu-db").then(() => {
+  console.log("DB connected successfully");
+});
 
 //Template Engine
 app.set("view engine", "ejs");
 
 //Middlewares
+app.use(
+  session({
+    secret: "my_keyboard_cat",
+    resave: false,
+    saveUninitialized: true,
+    store: MongoStore.create({ mongoUrl: 'mongodb://localhost/smartedu-db' })
+  })
+);
 app.use(express.static("public"));
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
+
+//GLOBAL VARIABLES
+global.userIN = null;
+app.use("*", (req, res, next) => {
+  userIN = req.session.userID;
+  next();
+});
 
 //ROUTERS
 app.use("/", pageRoute);
