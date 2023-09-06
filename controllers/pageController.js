@@ -32,35 +32,51 @@ exports.getContactPage = (req, res) => {
 };
 
 exports.sendEmail = async (req, res) => {
-  const outputMessage = `
-    <h1> MAİL DETAILS </h1>
-    <ul>
-      <li>Name: ${req.body.name} </li>
-      <li>Email: ${req.body.email}</li>
-    </ul>
-    <h1> MESSAGES </h1>
-    <p> ${req.body.message}</p>
-  `;
 
+  try{
+
+  const outputMessage = `
+  
+  <h1>Mail Details </h1>
+  <ul>
+    <li>Name: ${req.body.name}</li>
+    <li>Email: ${req.body.email}</li>
+  </ul>
+  <h1>Message</h1>
+  <p>${req.body.message}</p>
+  `
   const transporter = nodemailer.createTransport({
     host: 'smtp.ethereal.email',
     port: 587,
-    secure: false,
     auth: {
-        user: 'camilla.schroeder32@ethereal.email',
-        pass: 'XHB2gygzJVABGW52HA'
+        user: 'flo.rolfson63@ethereal.email',
+        pass: 'zNeuwxCdGzumHyhx8t'
     }
 });
 
   // send mail with defined transport object
-  const info = await transporter.sendMail({
-    from: '"Smartedu sending email to you" <camilla.schroeder32@ethereal.email>', // sender address
-    to: "busra.ayaar@gmail.com", // list of receivers
-    subject: "Smartedu ✔", // Subject line
+  let info = await transporter.sendMail({
+    from: '"Smart EDU Contact Form" <arinyazilim@gmail.com>', // sender address
+    to: "gcekic@gmail.com", // list of receivers
+    subject: "Smart EDU Contact Form New Message ✔", // Subject line
     html: outputMessage, // html body
   });
 
+  console.log("Message sent: %s", info.messageId);
+  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+
+  // Preview only available when sending through an Ethereal account
+  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+  // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+
   req.flash("success", "We Received your message succesfully");
 
-  console.log("Message sent: %s", info.messageId);
+  res.status(200).redirect('contact');
+
+} catch (err) {
+  //req.flash("error", `Something happened! ${err}`);
+  req.flash("error", `Something happened! ${err}`);
+  res.status(200).redirect('contact');
+}
+
 };
