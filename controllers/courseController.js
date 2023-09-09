@@ -25,9 +25,7 @@ exports.takeAllCourses = async (req, res) => {
     const categorySlug = req.query.categories;
     const query = req.query.search;
 
-    const category = await Category.findOne({ slug: categorySlug }).populate(
-      "user"
-    );
+    const category = await Category.findOne({ slug: categorySlug }).populate('user');
 
     let filter = {};
     
@@ -49,7 +47,8 @@ exports.takeAllCourses = async (req, res) => {
         {name: {$regex: '.*' + filter.name + '.*', $options: 'i'}},
         {category: filter.category}
       ]
-    }).sort("-createdAt").populate('user');
+    }).sort("-createdAt")
+    .populate('user');
     const categories = await Category.find({});
 
     res.status(200).render("courses", {
@@ -106,6 +105,21 @@ exports.releaseCourse = async (req, res) => {
     const user = await User.findById(req.session.userID);
     await user.courses.pull({ _id: req.body.course_id });
     await user.save();
+
+    res.status(200).redirect("/users/dashboard");
+  } catch (error) {
+    res.status(400).json({
+      status: "fail",
+      error,
+    });
+  }
+};
+
+
+exports.deleteCourse = async (req, res) => {
+  try {
+    const course = await Course.findOneAndRemove({slug: req.params.slug});
+    req.flash("error", `${course.name} has been removed successfully`);
 
     res.status(200).redirect("/users/dashboard");
   } catch (error) {
