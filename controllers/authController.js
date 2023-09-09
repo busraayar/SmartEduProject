@@ -2,16 +2,23 @@ const User = require("../moduls/User");
 const Category = require("../moduls/Category");
 const Course = require('../moduls/Course');
 const bcryptjs = require("bcryptjs");
+const { validationResult } = require('express-validator');
 
 exports.createUser = async (req, res) => {
   try {
     const user = await User.create(req.body);
-    res.status(201).redirect('/');
+    res.status(201).redirect('/login');
   } catch (error) {
-    res.status(400).json({
-      status: "fail",
-      error,
-    });
+
+    const result = validationResult(req);
+    console.log(result);
+    for(let i=0; i < result.array().length ; i++)
+    {
+      req.flash("error", `${result.array()[i].msg}`);
+    }
+  
+    res.status(400).redirect('/register');
+
   }
 };
 
@@ -25,8 +32,14 @@ exports.loginUser = async (req, res) => {
           req.session.userID = user._id;
           //USER SESSION
           res.status(200).redirect("/users/dashboard");
+        }else{
+          req.flash("error", `your password is wrong`);
+          res.status(200).redirect("/login");
         }
       });
+    }else{
+      req.flash("error", `User is not exist`);
+      res.status(200).redirect("/login");
     }
   } catch (error) {
     res.status(400).json({
