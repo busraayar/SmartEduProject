@@ -25,7 +25,7 @@ exports.takeAllCourses = async (req, res) => {
     const categorySlug = req.query.categories;
     const query = req.query.search;
 
-    const category = await Category.findOne({ slug: categorySlug }).populate('user');
+    const category = await Category.findOne({ slug: categorySlug });
 
     let filter = {};
     
